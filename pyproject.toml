@@ -1,0 +1,17 @@
+[tool.poetry]
+name = "ranking-metrics-torch"
+version = "0.1.0"
+description = "Common ranking metrics implemented with PyTorch"
+authors = ["Karl Higley <kmhigley@gmail.com>"]
+
+[tool.poetry.dependencies]
+python = "^3.7"
+torch = "^1.5.0"
+
+[tool.poetry.dev-dependencies]
+pytest = "^5.2"
+pylint = "^2.5.3"
+
+[build-system]
+requires = ["poetry>=0.12"]
+build-backend = "poetry.masonry.api"
