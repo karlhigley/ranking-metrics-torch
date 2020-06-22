@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "ranking-metrics-torch"
-version = "0.1.0"
+version = "0.2.0"
 description = "Common ranking metrics implemented with PyTorch"
 authors = ["Karl Higley <kmhigley@gmail.com>"]
 
