@@ -1,5 +1,8 @@
 import torch
 
+from ranking_metrics_torch.common import _check_inputs
+from ranking_metrics_torch.common import _extract_topk
+from ranking_metrics_torch.common import _create_output_placeholder
 from ranking_metrics_torch.precision_recall import precision_at
 
 
@@ -10,31 +13,25 @@ def avg_precision_at(
 
     Args:
         ks (torch.Tensor or list): list of cutoffs
-        scores (torch.Tensor): predicted item scores
-        labels (torch.Tensor): true item labels
+        scores (torch.Tensor): 2-dim tensor of predicted item scores
+        labels (torch.Tensor): 2-dim tensor of true item labels
 
     Returns:
         torch.Tensor: list of average precisions at cutoffs
     """
-
-    # Create a placeholder for the results
-    avg_precisions = torch.zeros(len(ks)).to(device=scores.device)
-
-    # Order and trim labels to top K using scores and maximum K
-    max_k = int(max(ks))
-    topk_scores, topk_indices = torch.topk(scores, max_k)
-    topk_labels = torch.gather(labels, 0, topk_indices)
+    ks, scores, labels = _check_inputs(ks, scores, labels)
+    topk_scores, _, topk_labels = _extract_topk(ks, scores, labels)
+    avg_precisions = _create_output_placeholder(scores, ks)
 
     # Compute average precisions at K
-    total_relevant = labels.sum()
+    num_relevant = torch.sum(labels, dim=1)
+    max_k = ks.max().item()
 
-    if total_relevant > 0:
-        for index, k in enumerate(ks):
-            relevant_pos = (topk_labels[:k] != 0).nonzero()
+    precisions = precision_at(1 + torch.arange(max_k), topk_scores, topk_labels)
+    rel_precisions = precisions * topk_labels
 
-            precisions = precision_at(relevant_pos + 1, topk_scores, topk_labels)
-            num_relevant = total_relevant if total_relevant <= k else k
-
-            avg_precisions[index] = precisions.sum() / float(num_relevant)
+    for index, k in enumerate(ks):
+        total_prec = rel_precisions[:, :int(k)].sum(dim=1)
+        avg_precisions[:, index] = total_prec / num_relevant.clamp(min=1, max=k)
 
     return avg_precisions
