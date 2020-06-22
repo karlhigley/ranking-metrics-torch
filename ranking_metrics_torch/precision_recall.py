@@ -1,5 +1,9 @@
 import torch
 
+from ranking_metrics_torch.common import _check_inputs
+from ranking_metrics_torch.common import _extract_topk
+from ranking_metrics_torch.common import _create_output_placeholder
+
 
 def precision_at(
     ks: torch.Tensor, scores: torch.Tensor, labels: torch.Tensor
@@ -15,17 +19,12 @@ def precision_at(
         torch.Tensor: list of precisions at cutoffs
     """
 
-    # Create a placeholder for the results
-    precisions = torch.zeros(len(ks)).to(device=scores.device)
+    ks, scores, labels = _check_inputs(ks, scores, labels)
+    _, _, topk_labels = _extract_topk(ks, scores, labels)
+    precisions = _create_output_placeholder(scores, ks)
 
-    # Order and trim labels to top K using scores and maximum K
-    max_k = max(ks)
-    _, topk_indices = torch.topk(scores, int(max_k))
-    topk_labels = torch.gather(labels, 0, topk_indices)
-
-    # Compute precisions at K
     for index, k in enumerate(ks):
-        precisions[index] = topk_labels[: int(k)].sum() / float(k)
+        precisions[:, index] = torch.sum(topk_labels[:, : int(k)], dim=1) / float(k)
 
     return precisions
 
@@ -44,19 +43,21 @@ def recall_at(
         torch.Tensor: list of recalls at cutoffs
     """
 
-    # Create a placeholder for the results
-    recalls = torch.zeros(len(ks)).to(device=scores.device)
-
-    # Order and trim labels to top K using scores and maximum K
-    max_k = max(ks)
-    _, topk_indices = torch.topk(scores, int(max_k))
-    topk_labels = torch.gather(labels, 0, topk_indices)
+    ks, scores, labels = _check_inputs(ks, scores, labels)
+    _, _, topk_labels = _extract_topk(ks, scores, labels)
+    recalls = _create_output_placeholder(scores, ks)
 
     # Compute recalls at K
-    num_relevant = labels.sum()
+    num_relevant = torch.sum(labels, dim=1)
+    rel_indices = (num_relevant != 0).nonzero()
 
-    if num_relevant > 0:
+    if rel_indices.shape[0] > 0:
         for index, k in enumerate(ks):
-            recalls[index] = topk_labels[: int(k)].sum() / num_relevant
+            rel_labels = topk_labels[rel_indices, : int(k)].squeeze()
+            rel_count = num_relevant[rel_indices].squeeze()
+
+            recalls[rel_indices, index] = torch.div(
+                torch.sum(rel_labels, dim=1), rel_count
+            ).reshape(len(rel_indices), 1)
 
     return recalls
