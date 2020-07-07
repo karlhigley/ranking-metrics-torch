@@ -14,10 +14,16 @@ def _check_inputs(ks, scores, labels):
     if scores.shape != labels.shape:
         raise ValueError("scores and labels must be the same shape")
 
+    if ks.device != scores.device:
+        ks = ks.to(device=scores.device)
+
+    if labels.device != scores.device:
+        labels = labels.to(device=scores.device)
+
     return (
-        ks.to(dtype=torch.int32, device=scores.device),
-        scores.to(dtype=torch.float64, device=scores.device),
-        labels.to(dtype=torch.float64, device=scores.device),
+        ks,
+        scores,
+        labels,
     )
 
 
