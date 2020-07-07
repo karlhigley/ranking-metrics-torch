@@ -48,12 +48,11 @@ def test_dcg_matches_sklearn(scores_at_ks):
 
     for i in range(len(pred_scores)):
         sklearn_dcgs_at_k = [
-            dcg_score([true_scores[i][:k]], [pred_scores[i][:k]], k=k, ignore_ties=True) for k in ks
+            dcg_score([true_scores[i][:k]], [pred_scores[i][:k]], k=k, ignore_ties=True)
+            for k in ks
         ]
 
-        assert dcgs_at_k[i].tolist() == pytest.approx(
-            sklearn_dcgs_at_k
-        )
+        assert dcgs_at_k[i].tolist() == pytest.approx(sklearn_dcgs_at_k)
 
 
 def test_ndcg_has_correct_shape(
@@ -90,9 +89,10 @@ def test_ndcg_matches_sklearn(scores_at_ks):
 
     for i in range(len(pred_scores)):
         sklearn_dcgs_at_k = [
-            ndcg_score([true_scores[i][:k]], [pred_scores[i][:k]], k=k, ignore_ties=True) for k in ks
+            ndcg_score(
+                [true_scores[i][:k]], [pred_scores[i][:k]], k=k, ignore_ties=True
+            )
+            for k in ks
         ]
 
-        assert ndcgs_at_k[i].tolist() == pytest.approx(
-            sklearn_dcgs_at_k
-        )
+        assert ndcgs_at_k[i].tolist() == pytest.approx(sklearn_dcgs_at_k)

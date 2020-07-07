@@ -23,12 +23,14 @@ def dcg_at(
     dcgs = _create_output_placeholder(scores, ks)
 
     # Compute discounts
-    discount_positions = torch.arange(ks.max().item()).to(
-        device=scores.device, dtype=torch.float64
+    discount_positions = torch.arange(
+        ks.max().item(),
+        device=scores.device,
+        dtype=torch.float64
     )
 
     discount_log_base = torch.log(
-        torch.tensor([log_base]).to(device=scores.device, dtype=torch.float64)
+        torch.tensor([log_base], device=scores.device, dtype=torch.float64)
     ).item()
 
     discounts = 1 / (torch.log(discount_positions + 2) / discount_log_base)
