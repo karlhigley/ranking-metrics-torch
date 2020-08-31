@@ -36,5 +36,5 @@ def _extract_topk(ks, scores, labels):
 
 def _create_output_placeholder(scores, ks):
     return torch.zeros(
-        scores.shape[0], len(ks), dtype=torch.float64, device=scores.device
+        scores.shape[0], len(ks), dtype=scores.dtype, device=scores.device
     )
