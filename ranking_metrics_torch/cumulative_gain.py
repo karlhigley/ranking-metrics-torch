@@ -63,7 +63,7 @@ def ndcg_at(
 
     # Compute discounted cumulative gains
     gains = dcg_at(ks, topk_scores, topk_labels)
-    normalizing_gains = dcg_at(ks, topk_labels, topk_labels)
+    normalizing_gains = dcg_at(ks, labels, labels)
 
     # Prevent divisions by zero
     relevant_pos = (normalizing_gains != 0).nonzero(as_tuple=True)

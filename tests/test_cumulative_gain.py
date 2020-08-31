@@ -64,6 +64,20 @@ def test_ndcg_has_correct_shape(
     assert ndcg_at_ks.shape == (batch_size, len(cutoffs))
 
 
+def test_ndcg_when_largest_k_is_smaller_than_labels(
+    batch_size: int, cutoffs: torch.Tensor, scores: torch.Tensor, labels: torch.Tensor
+) -> None:
+
+    ndcg_at_ks = ndcg_at(cutoffs, scores, labels)
+
+    ndcg_at_1k = ndcg_at(cutoffs[:1], scores, labels)
+    assert ndcg_at_1k[0] == ndcg_at_ks[0][0]
+
+    ndcg_at_2ks = ndcg_at(cutoffs[:2], scores, labels)
+    assert ndcg_at_2ks[0][0] == ndcg_at_ks[0][0]
+    assert ndcg_at_2ks[0][1] == ndcg_at_ks[0][1]
+
+
 def test_ndcg_when_nothing_is_relevant(
     batch_size: int, num_items: int, cutoffs: torch.Tensor, scores: torch.Tensor
 ) -> None:
