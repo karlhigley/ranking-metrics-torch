@@ -49,7 +49,7 @@ def recall_at(
 
     # Compute recalls at K
     num_relevant = torch.sum(labels, dim=1)
-    rel_indices = (num_relevant != 0).nonzero()
+    rel_indices = (num_relevant != 0).nonzero(as_tuple=False)
 
     if rel_indices.shape[0] > 0:
         for index, k in enumerate(ks):
