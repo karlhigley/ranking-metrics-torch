@@ -1,5 +1,15 @@
 import torch
 
+FLOAT_TYPES = [
+    torch.float,
+    torch.double,
+    torch.half,
+    torch.float32,
+    torch.float64,
+    torch.float16,
+    torch.bfloat16,
+]
+
 
 def _check_inputs(ks, scores, labels):
     if len(ks.shape) > 1:
@@ -19,6 +29,12 @@ def _check_inputs(ks, scores, labels):
 
     if labels.device != scores.device:
         labels = labels.to(device=scores.device)
+
+    if scores.dtype not in FLOAT_TYPES:
+        scores = scores.to(dtype=torch.float)
+
+    if labels.dtype not in FLOAT_TYPES:
+        labels = labels.to(dtype=torch.float)
 
     return (
         ks,
