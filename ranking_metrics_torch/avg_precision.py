@@ -31,7 +31,7 @@ def avg_precision_at(
     rel_precisions = precisions * topk_labels
 
     for index, k in enumerate(ks):
-        total_prec = rel_precisions[:, :int(k)].sum(dim=1)
+        total_prec = rel_precisions[:, : int(k)].sum(dim=1)
         avg_precisions[:, index] = total_prec / num_relevant.clamp(min=1, max=k)
 
     return avg_precisions

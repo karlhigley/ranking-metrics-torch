@@ -80,9 +80,7 @@ def test_recall_when_everything_is_relevant(
 ) -> None:
 
     r_at_ks = recall_at(cutoffs, scores, torch.ones(batch_size, num_items))
-    expected = (
-        (cutoffs.float() / num_items).repeat(batch_size, 1)
-    )
+    expected = (cutoffs.float() / num_items).repeat(batch_size, 1)
     assert torch.allclose(r_at_ks, expected)
 
 

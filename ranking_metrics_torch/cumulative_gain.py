@@ -24,9 +24,7 @@ def dcg_at(
 
     # Compute discounts
     discount_positions = torch.arange(
-        ks.max().item(),
-        device=scores.device,
-        dtype=torch.float64
+        ks.max().item(), device=scores.device, dtype=torch.float64
     )
 
     discount_log_base = torch.log(
