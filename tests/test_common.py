@@ -2,6 +2,7 @@ import pytest
 import torch
 
 from ranking_metrics_torch.common import _check_inputs
+from ranking_metrics_torch.common import _mask_with_nans
 
 
 def test_check_inputs_rejects_2d_cutoffs(
@@ -68,3 +69,23 @@ def test_check_inputs_converts_to_float(
 
     assert scores.dtype == torch.float
     assert labels.dtype == torch.float
+
+
+def test_mask_with_nans_operates_on_rows(
+    cutoffs: torch.Tensor, scores: torch.Tensor, labels: torch.Tensor
+) -> None:
+
+    zero_out = True
+    zeroed_rows = []
+    for row, _ in enumerate(labels):
+        if zero_out:
+            labels[row, :].fill_(0.0)
+            zeroed_rows.append(row)
+
+        zero_out = not zero_out
+
+    masked_scores = _mask_with_nans(scores, labels)
+
+    for row in zeroed_rows:
+        assert torch.isnan(masked_scores[row, :]).all()
+

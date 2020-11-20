@@ -26,7 +26,7 @@ def test_avg_precision_when_nothing_is_relevant(
 ) -> None:
 
     ap_at_ks = avg_precision_at(cutoffs, scores, torch.zeros(batch_size, num_items))
-    assert (ap_at_ks == torch.zeros(batch_size, len(cutoffs))).all()
+    assert torch.isnan(ap_at_ks).all()
 
 
 def test_avg_precision_when_everything_is_relevant(

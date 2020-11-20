@@ -54,3 +54,11 @@ def _create_output_placeholder(scores, ks):
     return torch.zeros(
         scores.shape[0], len(ks), dtype=scores.dtype, device=scores.device
     )
+
+
+def _mask_with_nans(metrics, labels):
+    for row, values in enumerate(labels):
+        if values.sum() == 0.0:
+            metrics[row, :].fill_(float("NaN"))
+
+    return metrics

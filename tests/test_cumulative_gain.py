@@ -28,7 +28,7 @@ def test_dcg_when_nothing_is_relevant(
 ) -> None:
 
     dcg_at_ks = dcg_at(cutoffs, scores, torch.zeros(batch_size, num_items))
-    assert (dcg_at_ks == torch.zeros(batch_size, len(cutoffs))).all()
+    assert torch.isnan(dcg_at_ks).all()
 
 
 @given(scores_at_ks())
@@ -83,7 +83,7 @@ def test_ndcg_when_nothing_is_relevant(
 ) -> None:
 
     ndcg_at_ks = ndcg_at(cutoffs, scores, torch.zeros(batch_size, num_items))
-    assert (ndcg_at_ks == torch.zeros(batch_size, len(cutoffs))).all()
+    assert torch.isnan(ndcg_at_ks).all()
 
 
 @given(scores_at_ks())

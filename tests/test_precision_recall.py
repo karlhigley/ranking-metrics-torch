@@ -19,7 +19,7 @@ def test_precision_when_nothing_is_relevant(
 ) -> None:
 
     p_at_ks = precision_at(cutoffs, scores, torch.zeros(batch_size, num_items))
-    assert (p_at_ks == torch.zeros(batch_size, len(cutoffs))).all()
+    assert torch.isnan(p_at_ks).all()
 
 
 def test_precision_when_everything_is_relevant(
@@ -72,7 +72,7 @@ def test_recall_when_nothing_is_relevant(
 ) -> None:
 
     r_at_ks = recall_at(cutoffs, scores, torch.zeros(batch_size, num_items))
-    assert (r_at_ks == torch.zeros(batch_size, len(cutoffs))).all()
+    assert torch.isnan(r_at_ks).all()
 
 
 def test_recall_when_everything_is_relevant(

@@ -3,6 +3,7 @@ import torch
 from ranking_metrics_torch.common import _check_inputs
 from ranking_metrics_torch.common import _extract_topk
 from ranking_metrics_torch.common import _create_output_placeholder
+from ranking_metrics_torch.common import _mask_with_nans
 from ranking_metrics_torch.precision_recall import precision_at
 
 
@@ -34,4 +35,4 @@ def avg_precision_at(
         total_prec = rel_precisions[:, : int(k)].sum(dim=1)
         avg_precisions[:, index] = total_prec / num_relevant.clamp(min=1, max=k)
 
-    return avg_precisions
+    return _mask_with_nans(avg_precisions, labels)

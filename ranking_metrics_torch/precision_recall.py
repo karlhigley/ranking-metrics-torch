@@ -3,12 +3,15 @@ import torch
 from ranking_metrics_torch.common import _check_inputs
 from ranking_metrics_torch.common import _extract_topk
 from ranking_metrics_torch.common import _create_output_placeholder
+from ranking_metrics_torch.common import _mask_with_nans
 
 
 def precision_at(
     ks: torch.Tensor, scores: torch.Tensor, labels: torch.Tensor
 ) -> torch.Tensor:
     """Compute precision@K for each of the provided cutoffs
+
+    Returns NaN when there are no relevant items present in the labels.
 
     Args:
         ks (torch.Tensor or list): list of cutoffs
@@ -23,10 +26,10 @@ def precision_at(
     _, _, topk_labels = _extract_topk(ks, scores, labels)
     precisions = _create_output_placeholder(scores, ks)
 
-    for index, k in enumerate(ks):
-        precisions[:, index] = torch.sum(topk_labels[:, : int(k)], dim=1) / float(k)
+    for column, k in enumerate(ks):
+        precisions[:, column] = torch.sum(topk_labels[:, : int(k)], dim=1) / float(k)
 
-    return precisions
+    return _mask_with_nans(precisions, labels)
 
 
 def recall_at(
@@ -60,4 +63,4 @@ def recall_at(
                 torch.sum(rel_labels, dim=1), rel_count
             ).reshape(len(rel_indices), 1)
 
-    return recalls
+    return _mask_with_nans(recalls, labels)

@@ -3,6 +3,7 @@ import torch
 from ranking_metrics_torch.common import _check_inputs
 from ranking_metrics_torch.common import _create_output_placeholder
 from ranking_metrics_torch.common import _extract_topk
+from ranking_metrics_torch.common import _mask_with_nans
 
 
 def dcg_at(
@@ -39,7 +40,7 @@ def dcg_at(
             (topk_labels[:, :k] * discounts[:k].repeat(topk_labels.shape[0], 1)), dim=1
         )
 
-    return dcgs
+    return _mask_with_nans(dcgs, labels)
 
 
 def ndcg_at(
@@ -70,4 +71,4 @@ def ndcg_at(
     gains[irrelevant_pos] = 0
     gains[relevant_pos] /= normalizing_gains[relevant_pos]
 
-    return gains
+    return _mask_with_nans(gains, labels)
